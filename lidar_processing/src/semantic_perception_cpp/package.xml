@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>semantic_perception</name>
+  <version>0.1.0</version>
+  <description>Phase 5 semantic perception interface for ROS 2 Humble.</description>
+  <maintainer email="arashdeepsingh1512@gmail.com">Arashdeep Singh</maintainer>
+  <license>Apache-2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+
+  <depend>rclcpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>cv_bridge</depend>
+
+  <exec_depend>launch</exec_depend>
+  <exec_depend>launch_ros</exec_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

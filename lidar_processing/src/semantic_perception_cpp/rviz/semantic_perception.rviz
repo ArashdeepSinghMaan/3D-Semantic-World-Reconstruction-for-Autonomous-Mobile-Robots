@@ -1,0 +1,15 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+
+Visualization Manager:
+  Class: ""
+
+  Displays:
+    - Class: rviz_default_plugins/Image
+      Name: Semantic Visualization
+      Topic: /semantic/visualization
+      Enabled: true
+
+  Global Options:
+    Fixed Frame: os_lidar

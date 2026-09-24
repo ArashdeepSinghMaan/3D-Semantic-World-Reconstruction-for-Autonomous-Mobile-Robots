@@ -1,0 +1,44 @@
+semantic_perception:
+  ros__parameters:
+
+    topics:
+      image: /stereo/frame_left/image_raw
+
+      detections: /semantic/detections
+      class_map: /semantic/class_map
+      confidence_map: /semantic/confidence_map
+      visualization: /semantic/visualization
+
+    model:
+      # Absolute path to an ONNX model.
+      path: ""
+
+      # opencv | cuda | cuda_fp16
+      backend: opencv
+      target: cpu
+
+      input_width: 640
+      input_height: 640
+
+      confidence_threshold: 0.25
+      nms_threshold: 0.45
+
+    classes:
+      names:
+        - road
+        - floor
+        - bushes
+        - trees
+        - stairs
+        - trench
+        - puddle
+        - rubble
+        - mud
+        - gravel
+        - grass
+        - dirt
+
+    visualization:
+      draw_labels: true
+      draw_semantic_map: true
+      semantic_alpha: 0.45
