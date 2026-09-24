@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>persistent_semantic_mapping</name>
+  <version>0.1.0</version>
+  <description>Phase 8 persistent voxel-based 3D semantic mapping for ROS 2 Humble.</description>
+  <maintainer email="arashdeepsingh1512@gmial.com">Arashdeep Singh</maintainer>
+  <license>Apache-2.0</license>
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <depend>rclcpp</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>visualization_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <export><build_type>ament_cmake</build_type></export>
+</package>

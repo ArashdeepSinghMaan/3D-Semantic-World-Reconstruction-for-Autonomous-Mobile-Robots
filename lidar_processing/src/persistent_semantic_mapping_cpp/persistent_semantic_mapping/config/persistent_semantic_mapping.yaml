@@ -1,0 +1,19 @@
+persistent_semantic_mapping:
+  ros__parameters:
+    topics:
+      input: /world_reconstruction/points
+      map: /semantic_map/points
+      markers: /semantic_map/markers
+      stats: /semantic_map/voxel_count
+    map_frame: map
+    voxel:
+      resolution: 0.10
+      min_confidence: 0.0
+      max_classes_per_voxel: 16
+    publish:
+      rate_hz: 2.0
+      max_voxels: 0
+    visualization:
+      unknown_class: -1
+      marker_size: 0.08
+      publish_markers: false

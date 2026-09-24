@@ -1,0 +1,16 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/PointCloud2
+      Name: Semantic Voxel Map
+      Topic: /semantic_map/points
+      Style: Points
+      Size (Pixels): 3
+      Color Transformer: Intensity
+      Intensity Channel: confidence
+  Global Options:
+    Fixed Frame: map
+  Name: persistent_semantic_mapping
