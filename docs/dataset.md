@@ -1,4 +1,4 @@
-l
+
 # Phase 0 — Dataset Understanding
 
 ## FusionPortable V2 — Legged Robot Dataset
