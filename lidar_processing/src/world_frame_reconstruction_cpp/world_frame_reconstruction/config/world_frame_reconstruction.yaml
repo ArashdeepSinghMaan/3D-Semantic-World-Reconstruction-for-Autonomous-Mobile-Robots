@@ -1,0 +1,29 @@
+world_frame_reconstruction:
+  ros__parameters:
+    topics:
+      input: /semantic_3d/fused_points
+      world_points: /world_reconstruction/points
+      accumulated_points: /world_reconstruction/accumulated
+
+    frames:
+      world: map
+      # Leave empty to use input PointCloud2 header.frame_id.
+      # Example: os_sensor
+      source_override: ""
+
+    tf:
+      timeout_sec: 0.10
+
+    filter:
+      min_confidence: 0.0
+      keep_unknown: true
+      unknown_class_id: -1
+
+    accumulation:
+      enabled: true
+      publish: true
+      # Bounded memory. Oldest points are removed when this limit is exceeded.
+      max_points: 1000000
+
+    output:
+      publish_every_n_frames: 1
