@@ -1,0 +1,25 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/PointCloud2
+      Enabled: true
+      Name: Semantic 3D Points
+      Topic: /semantic_3d/points
+      Size (Pixels): 3
+      Style: Flat Squares
+      Color Transformer: Intensity
+      Intensity Transformer: Intensity
+      Autocompute Intensity Bounds: true
+    - Class: rviz_default_plugins/PointCloud2
+      Enabled: false
+      Name: Unassigned Points
+      Topic: /semantic_3d/unassigned_points
+      Size (Pixels): 2
+      Style: Flat Squares
+      Color Transformer: RGB8
+  Global Options:
+    Fixed Frame: base_link
+  Name: Semantic3DFusion
