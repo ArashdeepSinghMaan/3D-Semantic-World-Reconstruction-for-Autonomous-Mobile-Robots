@@ -1,0 +1,47 @@
+pointcloud_registration:
+  ros__parameters:
+
+    input:
+      topic: /lidar/points/processed
+
+    output:
+      aligned_topic: /registration/aligned
+      target_topic: /registration/target
+      metrics_topic: /registration/metrics
+
+    initial_transform:
+      translation_xyz:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+
+      rotation_rpy_rad:
+        roll: 0.0
+        pitch: 0.0
+        yaw: 0.0
+
+    icp:
+      # point_to_point | point_to_plane
+      method: point_to_point
+
+      voxel_size: 0.10
+      max_correspondence_distance: 0.30
+      max_iterations: 50
+
+      transformation_epsilon: 0.000001
+      euclidean_fitness_epsilon: 0.000001
+
+      normal_k: 30
+      normal_radius_factor: 2.5
+
+      multiscale:
+        enabled: true
+
+        # coarse -> fine
+        voxel_sizes: [0.20, 0.10, 0.05]
+
+        # correspondence distance =
+        # voxel_size * correspondence_factor
+        correspondence_factors: [2.5, 2.0, 1.5]
+
+        iterations: [40, 30, 20]

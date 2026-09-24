@@ -1,0 +1,23 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/PointCloud2
+      Name: Target
+      Topic: /registration/target
+      Style: Points
+      Size (Pixels): 2
+      Enabled: true
+
+    - Class: rviz_default_plugins/PointCloud2
+      Name: Aligned Previous
+      Topic: /registration/aligned
+      Style: Points
+      Size (Pixels): 2
+      Enabled: true
+
+  Global Options:
+    Fixed Frame: os_lidar
