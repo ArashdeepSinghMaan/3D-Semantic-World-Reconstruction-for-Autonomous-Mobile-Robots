@@ -25,6 +25,8 @@ This project develops a **persistent 3D semantic world model** by combining:
 
 The project is implemented progressively using an open-source quadruped robotics dataset and is designed to eventually connect the reconstructed world model with autonomous navigation and higher-level robot reasoning.
 
+[Dataset Used](https://fusionportable.github.io/dataset/fusionportable_v2_data/)
+
 ---
 
 # 1. Core Idea
