@@ -4,7 +4,7 @@
   <version>0.1.0</version>
   <description>Phase 3 point-cloud registration using configurable PCL ICP.</description>
 
-  <maintainer email="arashdeepsingh1512@gmail.com">Arashdeep Singh</maintainer>
+  <maintainer email="user@example.com">Arashdeep Singh</maintainer>
   <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>

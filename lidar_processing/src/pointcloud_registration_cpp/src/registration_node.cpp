@@ -4,6 +4,7 @@
 #include <sstream>
 #include <string>
 #include <vector>
+#include <cstdint>
 
 #include <Eigen/Dense>
 
@@ -53,12 +54,28 @@ public:
 
     config_.multiscale_enabled = declare_parameter<bool>(
       "icp.multiscale.enabled", true);
+    
+
     config_.voxel_sizes = declare_parameter<std::vector<double>>(
-      "icp.multiscale.voxel_sizes", {0.20, 0.10, 0.05});
-    config_.correspondence_factors = declare_parameter<std::vector<double>>(
-      "icp.multiscale.correspondence_factors", {2.5, 2.0, 1.5});
-    config_.iterations = declare_parameter<std::vector<int>>(
-      "icp.multiscale.iterations", {40, 30, 20});
+    "icp.multiscale.voxel_sizes",
+    std::vector<double>{0.20, 0.10, 0.05});
+
+  config_.correspondence_factors = declare_parameter<std::vector<double>>(
+    "icp.multiscale.correspondence_factors",
+    std::vector<double>{2.5, 2.0, 1.5});
+
+  const auto iterations_param =
+  declare_parameter<std::vector<int64_t>>(
+    "icp.multiscale.iterations",
+    std::vector<int64_t>{40, 30, 20});
+
+config_.iterations.clear();
+config_.iterations.reserve(iterations_param.size());
+
+for (const auto value : iterations_param) {
+  config_.iterations.push_back(static_cast<int>(value));
+}
+
 
     config_.normal_k = declare_parameter<int>(
       "icp.normal_k", 30);

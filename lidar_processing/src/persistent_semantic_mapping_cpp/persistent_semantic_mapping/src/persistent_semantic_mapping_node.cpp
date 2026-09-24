@@ -2,7 +2,7 @@
 #include <rclcpp/rclcpp.hpp>
 #include <sensor_msgs/msg/point_cloud2.hpp>
 #include <sensor_msgs/point_cloud2_iterator.hpp>
-#include <std_msgs/msg/uint64.hpp>
+#include <std_msgs/msg/u_int64.hpp>
 #include <visualization_msgs/msg/marker_array.hpp>
 #include <visualization_msgs/msg/marker.hpp>
 #include <algorithm>
@@ -61,24 +61,70 @@ private:
     }
   }
 
-  void publishMap() {
+  void publishMap()
+{
     auto voxels = map_->snapshot();
-    if (max_publish_voxels_ > 0 && static_cast<size_t>(max_publish_voxels_) < voxels.size()) voxels.resize(max_publish_voxels_);
+
+    if (max_publish_voxels_ > 0 &&
+        static_cast<size_t>(max_publish_voxels_) < voxels.size())
+    {
+        voxels.resize(max_publish_voxels_);
+    }
+
     sensor_msgs::msg::PointCloud2 out;
-    out.header.stamp = now(); out.header.frame_id = map_frame_;
-    out.height = 1; out.width = static_cast<uint32_t>(voxels.size()); out.is_dense = true;
-    sensor_msgs::PointCloud2Modifier mod(out);
-    mod.setPointCloud2Fields(5, "x", 1, sensor_msgs::msg::PointField::FLOAT32, "y", 1, sensor_msgs::msg::PointField::FLOAT32,
-                             "z", 1, sensor_msgs::msg::PointField::FLOAT32, "class_id", 1, sensor_msgs::msg::PointField::INT32,
-                             "confidence", 1, sensor_msgs::msg::PointField::FLOAT32);
-    mod.resize(voxels.size());
-    sensor_msgs::PointCloud2Iterator<float> x(out, "x"), y(out, "y"), z(out, "z"), conf(out, "confidence");
+
+    out.header.stamp = now();
+    out.header.frame_id = map_frame_;
+
+    out.height = 1;
+    out.width = static_cast<uint32_t>(voxels.size());
+    out.is_dense = true;
+
+    sensor_msgs::PointCloud2Modifier modifier(out);
+
+    modifier.setPointCloud2Fields(
+        5,
+        "x", 1, sensor_msgs::msg::PointField::FLOAT32,
+        "y", 1, sensor_msgs::msg::PointField::FLOAT32,
+        "z", 1, sensor_msgs::msg::PointField::FLOAT32,
+        "class_id", 1, sensor_msgs::msg::PointField::INT32,
+        "confidence", 1, sensor_msgs::msg::PointField::FLOAT32
+    );
+
+    modifier.resize(voxels.size());
+
+    sensor_msgs::PointCloud2Iterator<float> x(out, "x");
+    sensor_msgs::PointCloud2Iterator<float> y(out, "y");
+    sensor_msgs::PointCloud2Iterator<float> z(out, "z");
     sensor_msgs::PointCloud2Iterator<int32_t> cls(out, "class_id");
-    for (const auto &v : voxels) { *x++=v.x; *y++=v.y; *z++=v.z; *cls++=v.class_id; *conf++=v.confidence; }
+    sensor_msgs::PointCloud2Iterator<float> conf(out, "confidence");
+
+    for (const auto& v : voxels)
+    {
+        *x = v.x;
+        *y = v.y;
+        *z = v.z;
+        *cls = v.class_id;
+        *conf = v.confidence;
+
+        ++x;
+        ++y;
+        ++z;
+        ++cls;
+        ++conf;
+    }
+
     map_pub_->publish(out);
-    std_msgs::msg::UInt64 stats; stats.data = map_->size(); stats_pub_->publish(stats);
-    if (publish_markers_) publishMarkers(voxels);
-  }
+
+    std_msgs::msg::UInt64 stats;
+    stats.data = map_->size();
+    stats_pub_->publish(stats);
+
+    if (publish_markers_)
+    {
+        publishMarkers(voxels);
+    }
+}
 
   void publishMarkers(const std::vector<VoxelOutput> &voxels) {
     visualization_msgs::msg::MarkerArray arr;
