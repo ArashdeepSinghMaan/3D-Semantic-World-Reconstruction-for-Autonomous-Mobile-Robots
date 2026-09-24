@@ -1,0 +1,10 @@
+forest_tf_node:
+  ros__parameters:
+    odom_topic: /unitree/body_odom
+    world_frame: world
+    body_frame: body_imu
+    sensor_frame: ouster00
+    use_header_frame_as_parent: false
+
+static_tf_republisher:
+  ros__parameters: {}
