@@ -56,8 +56,10 @@ bool WorldFrameReconstructionNode::readSemanticCloud(
     return false;
   }
   if (!has_class || !has_conf) {
-    RCLCPP_WARN_THROTTLE(get_logger(), *get_clock(), 5000,
-      "Input cloud has no semantic class_id/confidence fields; values will be treated as unknown.");
+   RCLCPP_WARN(
+    get_logger(),
+    "Input cloud has no semantic class_id/confidence fields; "
+    "values will be treated as unknown.");
   }
 
   try {

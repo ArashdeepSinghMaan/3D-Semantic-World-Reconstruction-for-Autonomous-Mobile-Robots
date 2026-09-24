@@ -6,13 +6,13 @@
 
 #include <opencv2/imgcodecs.hpp>
 
-#include "cv_bridge/cv_bridge.hpp"
+#include "cv_bridge/cv_bridge.h"
 #include "rclcpp/rclcpp.hpp"
 #include "sensor_msgs/image_encodings.hpp"
 #include "sensor_msgs/msg/image.hpp"
 #include "std_msgs/msg/float32_multi_array.hpp"
 #include "std_msgs/msg/int32_multi_array.hpp"
-#include "std_msgs/msg/String.hpp"
+#include "std_msgs/msg/string.hpp"
 
 #include "semantic_perception/inference.hpp"
 #include "semantic_perception/visualization.hpp"

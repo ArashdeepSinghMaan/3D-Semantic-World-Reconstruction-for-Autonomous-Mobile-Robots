@@ -1,5 +1,5 @@
 #include "semantic_perception/postprocess.hpp"
-
+#include <opencv2/imgproc.hpp>
 #include <algorithm>
 
 namespace semantic_perception

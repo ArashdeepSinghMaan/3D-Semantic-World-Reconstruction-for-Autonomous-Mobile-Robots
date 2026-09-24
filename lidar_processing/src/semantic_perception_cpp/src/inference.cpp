@@ -226,16 +226,51 @@ std::vector<Detection> Inference::decodeYoloDetection(
 }
 
 void Inference::buildPixelMapsFromDetections(
-  const std::vector<Detection> & detections,
-  const cv::Size & image_size,
-  cv::Mat & class_map,
-  cv::Mat & confidence_map)
+    const std::vector<Detection>& detections,
+    const cv::Size& image_size,
+    cv::Mat& class_map,
+    cv::Mat& confidence_map) const
 {
-  buildSemanticMaps(
-    detections,
+  class_map = cv::Mat(
     image_size,
-    class_map,
-    confidence_map);
+    CV_32S,
+    cv::Scalar(-1));
+
+  confidence_map = cv::Mat(
+    image_size,
+    CV_32F,
+    cv::Scalar(0.0f));
+
+  for (const auto& detection : detections) {
+    const cv::Rect clipped =
+      detection.bounding_box & cv::Rect(
+        0,
+        0,
+        image_size.width,
+        image_size.height);
+
+    if (clipped.width <= 0 || clipped.height <= 0) {
+      continue;
+    }
+
+    for (int y = clipped.y;
+         y < clipped.y + clipped.height;
+         ++y)
+    {
+      for (int x = clipped.x;
+           x < clipped.x + clipped.width;
+           ++x)
+      {
+        float& current_confidence =
+          confidence_map.at<float>(y, x);
+
+        if (detection.confidence > current_confidence) {
+          current_confidence = detection.confidence;
+          class_map.at<int>(y, x) = detection.class_id;
+        }
+      }
+    }
+  }
 }
 
 SemanticOutput Inference::infer(const cv::Mat & image)
