@@ -1,0 +1,92 @@
+# Phase 2 geometric analysis configuration.
+# Read by the ROS node and by the offline tool (offline_geometry), so offline
+# experiments use exactly the node's settings. All values are in the input
+# cloud's frame and in metres unless stated otherwise.
+# ROS 2 YAML cannot express an empty list; 30 and 30.0 are interchangeable.
+
+geometric_analysis:
+  ros__parameters:
+    # ─── ROS I/O (read at startup) ───────────────────────────────────────
+    input_topic: /lidar/points/voxelized        # Phase 1 output (or /os_cloud_node/points)
+    ground_topic: /geometry/ground
+    non_ground_topic: /geometry/non_ground
+    clusters_topic: /geometry/clusters
+    normals_topic: /geometry/normals
+    markers_topic: /geometry/markers
+    diagnostics_topic: /diagnostics
+    input_qos_reliability: best_effort
+    queue_depth: 1
+    stats_window: 100
+
+    # ─── Runtime-changeable node options ─────────────────────────────────
+    process_every_n: 1
+    publish_ground: true
+    publish_non_ground: true
+    publish_clusters: true
+    publish_normals: true
+    publish_markers: true
+    publish_diagnostics: true
+    log_every_n_frames: 50
+    log_clusters: false
+    processing_budget_ms: 100.0
+    markers:
+      boxes: true
+      labels: true
+      ground: true
+      ground_size: 20.0
+      normals_max: 300                          # 0 = do not draw normals
+      normal_length: 0.3
+
+    # ─── Geometry pipeline (runtime-changeable) ──────────────────────────
+    ground:
+      enabled: true
+      method: ransac                            # ransac (one plane) | grid (plane per cell)
+      reference_normal: [0.0, 0.0, 1.0]         # expected "up"
+      reference_frame: ""                       # e.g. base_link: rotate reference_normal via TF;
+                                                # "" = reference_normal is in the cloud frame
+      max_angle_deg: 20.0                       # reject plane hypotheses tilted more than this
+      min_inliers: 100
+      candidate_max_height_enabled: false       # only points below this height (along "up",
+      candidate_max_height: 0.5                 # from the sensor) may define the ground plane
+
+    ransac:
+      distance_threshold: 0.08                  # inlier / ground classification distance
+      max_iterations: 1000
+      probability: 0.999                        # adaptive early termination
+      refine: true                              # least-squares re-fit on the inliers
+      score_sample_size: 20000                  # score hypotheses on a subset (0 = all points)
+      seed: -1                                  # >= 0 for reproducible experiments
+
+    grid:                                       # used when ground.method is grid
+      cell_size: 5.0
+      min_points: 50
+      distance_threshold: 0.08
+      max_iterations: 100
+      max_tilt_deg: 25.0                        # cell plane vs global plane
+      max_height_offset: 0.4                    # cell plane vs global plane at the cell centre
+
+    clustering:
+      enabled: true
+      input: non_ground                         # non_ground | all
+      tolerance: 0.25                           # keep >= 1.5 x the input voxel size
+      min_points: 20
+      max_points: 50000                         # 0 = unlimited
+      min_height_above_ground: -1.0e9           # e.g. 0.2 drops clusters lower than 20 cm
+
+    normals:
+      enabled: true
+      neighbors: 30                             # k nearest neighbours (incl. the point)
+      radius: 0.0                               # > 0: also limit neighbours to this radius
+      min_neighbors: 5
+      orientation: viewpoint                    # viewpoint | reference | none
+      viewpoint: [0.0, 0.0, 0.0]                # sensor origin in the cloud frame
+      target: non_ground                        # all | non_ground (ground normals ~ plane normal)
+      max_points: 0                             # > 0: normals for a random subset only; the
+                                                # KD-tree query (~5 us/point/core) dominates cost
+
+    boxes:
+      enabled: true
+      type: upright                             # upright (gravity-aligned) | pca | aabb
+
+    features:
+      enabled: true                             # linearity / planarity / scattering / verticality
