@@ -1,0 +1,8 @@
+# pip dependencies not available through rosdep on Ubuntu 22.04 / ROS 2 Humble.
+# ROS 2 Humble's Python packages are built against NumPy 1.x; keep it there.
+numpy>=1.21,<2
+scipy>=1.8
+pyyaml
+rosbags>=0.9.20        # offline bag inspection (inspect_bag)
+open3d>=0.17           # optional: visualize_frame, open3d backends
+pytest

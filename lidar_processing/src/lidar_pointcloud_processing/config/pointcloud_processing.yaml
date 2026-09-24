@@ -1,0 +1,75 @@
+# Phase 1 LiDAR preprocessing configuration.
+#
+# The same file is read by the ROS node and by the offline tools
+# (offline_experiments, visualize_frame), so an experiment run offline uses
+# exactly the settings the node will use.
+#
+# Notes on ROS 2 YAML:
+#   * An empty list [] cannot be expressed in a ROS 2 parameter file.
+#     Use [""] instead (empty strings are ignored).
+#   * Pipeline parameters accept 30 or 30.0 interchangeably.
+
+pointcloud_processing:
+  ros__parameters:
+    # ─── ROS I/O (read at startup) ───────────────────────────────────────
+    input_topic: /os_cloud_node/points
+    filtered_topic: /lidar/points/filtered      # full resolution, all fields kept
+    voxelized_topic: /lidar/points/voxelized    # x, y, z, averaged fields, point_count
+    diagnostics_topic: /diagnostics
+    input_qos_reliability: best_effort          # best_effort also matches reliable publishers
+    queue_depth: 1                              # drop stale frames instead of lagging
+    stats_window: 100
+
+    # ─── Runtime-changeable node options ─────────────────────────────────
+    publish_filtered: true
+    publish_voxelized: true
+    publish_diagnostics: true
+    log_every_n_frames: 50                      # 0 disables periodic summaries
+    processing_budget_ms: 100.0                 # 10 Hz LiDAR -> 100 ms per frame
+
+    # ─── Pipeline (all runtime-changeable with `ros2 param set`) ─────────
+    filters:
+      remove_nonfinite: true                    # NaN / Inf coordinates
+      remove_zero: true                         # Ouster "no return" points at (0, 0, 0)
+      zero_epsilon: 1.0e-6
+
+    range_filter:
+      enabled: true
+      min_range: 0.5                            # metres, sensor-frame Euclidean range
+      max_range: 50.0
+
+    # Self-filter: remove the robot body / legs. Coordinates are in the
+    # cloud's own frame_id (check the layout log). Disabled until the box has
+    # been measured from real frames (visualize_frame --view raw).
+    crop_box:
+      enabled: false
+      min_xyz: [-0.5, -0.5, -0.5]
+      max_xyz: [0.5, 0.5, 0.5]
+      negative: true                            # true: remove inside; false: keep only inside
+
+    voxel:
+      enabled: true
+      voxel_size: 0.05                          # metres
+      min_points_per_voxel: 1
+      average_fields: ["intensity"]             # missing fields are skipped with a warning
+      include_point_count: true
+
+    outlier:
+      method: none                              # none | statistical | radius
+      apply_to: voxelized                       # voxelized (cheap) | filtered (full resolution)
+      backend: scipy                            # scipy | open3d
+      nb_neighbors: 20                          # statistical
+      std_ratio: 2.0                            # statistical
+      radius: 0.2                               # radius; keep >= 2 x voxel_size
+      min_points: 5                             # radius; count includes the point itself
+
+    output:
+      keep_organized: false                     # true: filtered cloud stays H x W, removed points -> NaN
+
+pointcloud_inspector:
+  ros__parameters:
+    topic: /os_cloud_node/points
+    report_period_s: 5.0
+    input_qos_reliability: best_effort
+    quality_every_n: 1
+    history: 3000
