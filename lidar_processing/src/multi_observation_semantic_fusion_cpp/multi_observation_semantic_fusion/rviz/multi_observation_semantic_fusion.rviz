@@ -1,0 +1,13 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+Visualization Manager:
+  Class: ""
+  Displays:
+    - Class: rviz_default_plugins/PointCloud2
+      Name: Semantic Fusion Map
+      Topic: /semantic_fusion/map
+      Size (Pixels): 3
+      Style: Flat Squares
+  Global Options:
+    Fixed Frame: map

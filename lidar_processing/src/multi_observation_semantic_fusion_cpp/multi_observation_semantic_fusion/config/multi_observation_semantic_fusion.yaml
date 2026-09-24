@@ -1,0 +1,16 @@
+multi_observation_semantic_fusion:
+  ros__parameters:
+    topics:
+      input: /semantic_map/points
+      output: /semantic_fusion/map
+    output:
+      frame: map
+      max_points: 500000
+    voxel:
+      resolution: 0.10
+    semantic:
+      num_classes: 20
+      prior: 0.001
+    fusion:
+      publish_min_confidence: 0.0
+      decay_seconds: 0.0
