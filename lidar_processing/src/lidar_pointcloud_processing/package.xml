@@ -9,7 +9,7 @@
     crop-box filtering, voxel downsampling, outlier removal), diagnostics,
     live and offline inspection tools, and Phase 1 experiments.
   </description>
-  <maintainer email="arashdeepsingh1512@gmail.com">ArashdeepSingh</maintainer>
+  <maintainer email="you@example.com">Your Name</maintainer>
   <license>Apache-2.0</license>
 
   <exec_depend>rclpy</exec_depend>

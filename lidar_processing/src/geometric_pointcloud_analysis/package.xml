@@ -9,7 +9,7 @@
     surface normals and curvature, bounding boxes (AABB, PCA, gravity-aligned),
     shape features, RViz markers, diagnostics and offline experiments.
   </description>
-  <maintainer email="arashdeepsingh1512@gmail.com">ArashdeepSingh</maintainer>
+  <maintainer email="you@example.com">Your Name</maintainer>
   <license>Apache-2.0</license>
 
   <exec_depend>lidar_pointcloud_processing</exec_depend>
