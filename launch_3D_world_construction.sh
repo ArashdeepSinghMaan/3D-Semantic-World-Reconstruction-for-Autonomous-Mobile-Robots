@@ -3,7 +3,7 @@
 set -euo pipefail
 
 SESSION_NAME="semantic_world"
-WORKSPACE_DIR="/media/hitech/NewVolume/Quadruped/lidar_processing"
+WORKSPACE_DIR="/media/Quadruped/lidar_processing"
 SETUP_CMD="source /opt/ros/humble/setup.bash && source $WORKSPACE_DIR/install/setup.bash"
 
 # ------------------------------------------------------------
