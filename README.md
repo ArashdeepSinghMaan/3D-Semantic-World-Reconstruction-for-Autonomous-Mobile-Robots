@@ -21,7 +21,7 @@ The objective is not simply to generate a 3D point cloud. The goal is to constru
 - **How observations from different viewpoints contribute to the same world model**
 
 The resulting representation can serve as a perception layer for downstream robotics applications such as navigation, planning, obstacle reasoning, and eventually language-grounded robot interaction.
-
+[Dataset Used](https://fusionportable.github.io/dataset/fusionportable_v2_data/)
 ---
 
 # 1. Problem Statement
