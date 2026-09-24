@@ -1,183 +1,106 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-# ============================================================
-# 3D Semantic World Reconstruction
-# Phase 9 - Full Pipeline Launcher
-# ============================================================
+set -euo pipefail
 
-set -e
-
-WORKSPACE="/media/NewVolume/Quadruped/lidar_processing"
-
-echo "============================================================"
-echo "  3D Semantic World Reconstruction"
-echo "  Phase 9 - Full Pipeline"
-echo "============================================================"
+SESSION_NAME="semantic_world"
+WORKSPACE_DIR="/media/hitech/NewVolume/Quadruped/lidar_processing"
+SETUP_CMD="source /opt/ros/humble/setup.bash && source $WORKSPACE_DIR/install/setup.bash"
 
 # ------------------------------------------------------------
-# Source ROS 2
+# Kill existing session
 # ------------------------------------------------------------
 
-source /opt/ros/humble/setup.bash
-
-# ------------------------------------------------------------
-# Source workspace
-# ------------------------------------------------------------
-
-if [ ! -f "$WORKSPACE/install/setup.bash" ]; then
-    echo "[ERROR] Workspace has not been built."
-    echo "Run:"
-    echo "  cd $WORKSPACE"
-    echo "  colcon build --symlink-install"
-    exit 1
+if tmux has-session -t "$SESSION_NAME" 2>/dev/null; then
+    echo "Killing existing session '$SESSION_NAME'..."
+    tmux kill-session -t "$SESSION_NAME"
 fi
 
-source "$WORKSPACE/install/setup.bash"
-
-echo "[INFO] ROS 2 Humble sourced"
-echo "[INFO] Workspace sourced"
-echo ""
-
 # ------------------------------------------------------------
-# Helper function
+# Create tmux session
 # ------------------------------------------------------------
 
-launch_node()
-{
-    PACKAGE=$1
-    EXECUTABLE=$2
-    TITLE=$3
+tmux new-session -d -s "$SESSION_NAME" -n nodes
 
-    echo "[START] $PACKAGE -> $EXECUTABLE"
+# ------------------------------------------------------------
+# Create panes
+# ------------------------------------------------------------
 
-    gnome-terminal \
-        --title="$TITLE" \
-        -- bash -c "
-            source /opt/ros/humble/setup.bash
-            source $WORKSPACE/install/setup.bash
+attempt_split() {
+    if ! tmux split-window -t "$SESSION_NAME:nodes" -l 10 2>/dev/null; then
+        echo "Vertical split failed, trying horizontal split..."
+        if ! tmux split-window -t "$SESSION_NAME:nodes" -h -l 20 2>/dev/null; then
+            echo "Warning: Cannot split further."
+            return 1
+        fi
+    fi
 
-            echo '================================================'
-            echo ' $TITLE'
-            echo '================================================'
-            echo ''
-
-            ros2 run $PACKAGE $EXECUTABLE
-
-            echo ''
-            echo '================================================'
-            echo ' $TITLE stopped'
-            echo '================================================'
-            read
-        "
+    return 0
 }
 
-# ============================================================
-# PIPELINE
-# ============================================================
-
-echo ""
-echo "Starting Phase 9 pipeline..."
-echo ""
+# 8 nodes -> 8 panes
+for i in {1..7}; do
+    attempt_split || break
+done
 
 # ------------------------------------------------------------
-# Phase 1 / World reconstruction
+# Tiled layout
 # ------------------------------------------------------------
 
-launch_node \
-    world_frame_reconstruction \
-    world_frame_reconstruction_node \
-    "World Frame Reconstruction"
-
-sleep 1
-
+tmux select-layout -t "$SESSION_NAME:nodes" tiled
 
 # ------------------------------------------------------------
-# Camera-LiDAR calibration / projection
+# Phase-9 ROS2 nodes
 # ------------------------------------------------------------
 
-launch_node \
-    camera_lidar_calibration \
-    camera_lidar_projection_node \
-    "Camera LiDAR Projection"
-
-sleep 1
-
-
-# ------------------------------------------------------------
-# Semantic perception
-# ------------------------------------------------------------
-
-launch_node \
-    semantic_perception \
-    semantic_perception_node \
-    "Semantic Perception"
-
-sleep 1
-
+commands=(
+    "ros2 run world_frame_reconstruction world_frame_reconstruction_node"
+    "ros2 run camera_lidar_calibration camera_lidar_projection_node"
+    "ros2 run semantic_perception semantic_perception_node"
+    "ros2 run semantic_3d_fusion semantic_3d_fusion_node"
+    "ros2 run multi_observation_semantic_fusion multi_observation_semantic_fusion_node"
+    "ros2 run persistent_semantic_mapping persistent_semantic_mapping_node"
+    "ros2 run pointcloud_registration pointcloud_registration_node"
+    "ros2 run terrain_reasoning negative_obstacle_detector"
+)
 
 # ------------------------------------------------------------
-# Semantic 3D fusion
+# Start each node in its own pane
 # ------------------------------------------------------------
 
-launch_node \
-    semantic_3d_fusion \
-    semantic_3d_fusion_node \
-    "Semantic 3D Fusion"
+for idx in "${!commands[@]}"; do
 
-sleep 1
+    if tmux list-panes \
+        -t "$SESSION_NAME:nodes" \
+        -F "#{pane_index}" 2>/dev/null |
+        grep -qx "$idx"
+    then
 
+        tmux send-keys \
+            -t "$SESSION_NAME:nodes.$idx" \
+            "$SETUP_CMD && ${commands[$idx]}" \
+            C-m
 
-# ------------------------------------------------------------
-# Multi-observation semantic fusion
-# ------------------------------------------------------------
+        echo "Started: ${commands[$idx]}"
 
-launch_node \
-    multi_observation_semantic_fusion \
-    multi_observation_semantic_fusion_node \
-    "Multi Observation Semantic Fusion"
+    else
 
-sleep 1
+        echo "Pane $idx does not exist:"
+        echo "  ${commands[$idx]}"
 
+    fi
 
-# ------------------------------------------------------------
-# Persistent semantic mapping
-# ------------------------------------------------------------
-
-launch_node \
-    persistent_semantic_mapping \
-    persistent_semantic_mapping_node \
-    "Persistent Semantic Mapping"
-
-sleep 1
-
+done
 
 # ------------------------------------------------------------
-# Point cloud registration
+# Enable mouse support
 # ------------------------------------------------------------
 
-launch_node \
-    pointcloud_registration \
-    pointcloud_registration_node \
-    "Point Cloud Registration"
-
-sleep 1
-
+tmux set-option -g mouse on
 
 # ------------------------------------------------------------
-# Terrain reasoning
+# Attach
 # ------------------------------------------------------------
 
-launch_node \
-    terrain_reasoning \
-    negative_obstacle_detector \
-    "Negative Obstacle Detector"
+tmux select-window -t "$SESSION_NAME:nodes"
 
-
-echo ""
-echo "============================================================"
-echo "  All Phase 9 nodes launched"
-echo "============================================================"
-echo ""
-echo "Use the individual terminals to monitor each node."
-echo "Close the terminals to stop individual nodes."
-echo ""
+tmux attach-session -t "$SESSION_NAME"
