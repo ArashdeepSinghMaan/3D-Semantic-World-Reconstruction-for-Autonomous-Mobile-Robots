@@ -1,0 +1,57 @@
+camera_lidar_projection:
+  ros__parameters:
+
+    topics:
+      lidar: /os_cloud_node/points
+      image: /stereo/frame_left/image_raw
+      camera_info: /stereo/frame_left/camera_info
+
+      overlay: /camera_lidar/overlay
+      projected_cloud: /camera_lidar/projected_points
+
+    calibration:
+      # true = obtain image geometry and distortion from CameraInfo.
+      # false = use the explicit values below.
+      use_camera_info: true
+
+      image_width: 0
+      image_height: 0
+
+      fx: 0.0
+      fy: 0.0
+      cx: 0.0
+      cy: 0.0
+
+    # T_camera_lidar maps:
+    #
+    #     P_camera = T_camera_lidar * P_lidar
+    #
+    # Translation is metres.
+    # Rotation is radians.
+    extrinsic:
+      translation_xyz:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+
+      rotation_rpy_rad:
+        roll: 0.0
+        pitch: 0.0
+        yaw: 0.0
+
+    projection:
+      min_depth: 0.10
+
+      # For already rectified images, normally set false.
+      # For raw distorted images, set true.
+      apply_distortion: false
+
+      occlusion:
+        enabled: true
+        window_size: 1
+        depth_tolerance_m: 0.15
+
+    visualization:
+      point_radius: 3
+      alpha: 0.85
+      color_by_depth: true
